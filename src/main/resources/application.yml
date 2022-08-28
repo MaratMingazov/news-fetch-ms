@@ -1,0 +1,38 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: @app.name@
+  main:
+    allow-bean-definition-overriding: true
+
+
+springdoc:
+  title: @app.name@
+  description: @app.description@
+  version: @app.version@
+  contact:
+    name: Marat Mingazov
+    email: maratmingazovr@gmail.com
+  default-produces-media-type: application/json
+  api-docs:
+    groups:
+      enabled: true
+  swagger-ui:
+    display-request-duration: true
+    groups-order: DESC
+    operationsSorter: method
+
+logging:
+  level:
+    ROOT: INFO
+
+info:
+  app:
+    name: @app.name@
+    description: @app.description@
+    version: @app.version@
+    java:
+      version: @java.version@
+  build-timestamp: @maven.build.timestamp@
