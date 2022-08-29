@@ -42,8 +42,9 @@ public class GoogleNewsFacade {
             val response = objectMapper.readValue(newsResponseJson, GoogleNewsResponse.class);
             val articles = response.getArticles();
             val savedArticles = mongoService.saveArticles(articles);
+            val quintets = mongoService.calculateQuintets(savedArticles);
 
-            log.info("GoogleNewsFacade: successfully fetched news: articles={}, savedArticles={}", articles.size(), savedArticles.size());
+            log.info("GoogleNewsFacade: successfully fetched news: articles={}, savedArticles={}, quintets={}", articles.size(), savedArticles.size(), quintets.size());
         } catch (JsonProcessingException e) {
             log.error("GoogleNewsFacade: json parsing exception e={}, json={}", e.getMessage(), newsResponseJson);
         }
@@ -56,34 +57,5 @@ public class GoogleNewsFacade {
 
 
 
-    //
-//    private void analyzeGoogleNewsResponse(GoogleNewsResponse response) {
-//        val articles = response.getArticles();
-//        articles.forEach(this::analyzeArticle);
-//    }
-//
-//    private void analyzeArticle(GoogleNewsArticle article) {
-//        val title = article.getTitle();
-//        System.err.println("title= " + title);
-//        if (title == null) {
-//            return;
-//        }
-//        val words = Arrays.stream(title.split( " ")).collect(Collectors.toList());
-//
-//        if(words.size() < 4) {
-//            return;
-//        }
-//
-//        int middleIndex = 2;
-//        while(middleIndex + 2 < words.size() ) {
-//            val word_0 = words.get(middleIndex - 2);
-//            val word_1 = words.get(middleIndex - 1);
-//            val word_2 = words.get(middleIndex);
-//            val word_3 = words.get(middleIndex + 1);
-//            val word_4 = words.get(middleIndex + 2);
-//
-//            System.err.println(word_0 + "|" + word_1 + "|" + word_2 + "|" + word_3 + "|" + word_4);
-//            middleIndex++;
-//        }
-//    }
+
 }
