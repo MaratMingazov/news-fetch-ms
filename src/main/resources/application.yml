@@ -36,3 +36,9 @@ info:
     java:
       version: @java.version@
   build-timestamp: @maven.build.timestamp@
+
+google-news:
+  url: ${GOOGLE_NEWS_URL}
+
+mongodb:
+  url: ${MONGO_DB_URL}
