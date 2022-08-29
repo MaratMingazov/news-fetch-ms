@@ -1,4 +1,4 @@
-package maratmingazov.news.fetch.model;
+package maratmingazov.news.fetch.model.google;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
