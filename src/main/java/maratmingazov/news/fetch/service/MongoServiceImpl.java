@@ -53,7 +53,7 @@ public class MongoServiceImpl implements MongoService {
                     )
             );
             val existingDocument = mongoTemplate.findOne(query, MongoArticle.class);
-            //if(existingDocument == null) {
+            if(existingDocument == null) {
                 val mongoArticle = MongoArticle.builder()
                         .title(article.getTitle())
                         .description(article.getDescription())
@@ -62,7 +62,7 @@ public class MongoServiceImpl implements MongoService {
                         .build();
                 val savedArticle = mongoTemplate.save(mongoArticle);
                 mongoArticles.add(savedArticle);
-            //}
+            }
         }
 
         return mongoArticles;
