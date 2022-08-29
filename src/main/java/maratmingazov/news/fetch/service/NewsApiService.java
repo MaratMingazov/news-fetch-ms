@@ -1,6 +1,10 @@
 package maratmingazov.news.fetch.service;
 
+import lombok.NonNull;
+import reactor.core.publisher.Mono;
+
 public interface NewsApiService {
 
-    void getNews();
+    @NonNull
+    Mono<String> getNews();
 }
