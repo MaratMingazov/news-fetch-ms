@@ -18,6 +18,8 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -124,18 +126,6 @@ public class MongoServiceImpl implements MongoService {
         return quintets;
     }
 
-
-
-//    @Scheduled(fixedDelay = 60000)
-    @Scheduled(cron = "0 0 05 * * *") // at 05:00 UTC, on every day
-    private void deleteOldArticles() {
-        LocalDateTime now = LocalDateTime.now().minusDays(1);
-        Query query = new Query();
-        query.addCriteria(Criteria.where("publishedAt").lt(now));
-        val removedArticles = mongoTemplate.findAllAndRemove(query, MongoArticle.class);
-        log.info("MongoServiceImpl: successfully removed old articles={}", removedArticles.size());
-    }
-
     @NonNull
     @Override
     public Integer saveQuintets(@NonNull List<MongoQuintet> quintets) {
@@ -143,7 +133,6 @@ public class MongoServiceImpl implements MongoService {
         List<MongoWord> newMongoWords = new ArrayList<>();
         List<MongoWord> updatedMongoWords = new ArrayList<>();
 
-        int localIncr = 0;
         for (MongoQuintet quintet : quintets) {
             Query query = new Query();
             query.addCriteria(Criteria.where("value").is(quintet.getWord_2()));
@@ -231,5 +220,107 @@ public class MongoServiceImpl implements MongoService {
 
 
         return incrementedWords;
+    }
+
+
+    @Scheduled(cron = "0 0 03 * * *") // at 03:00 UTC, on every day
+    private void decrementCounts() {
+        val initial = Instant.now();
+        val words = mongoTemplate.findAll(MongoWord.class);
+        for (MongoWord word : words) {
+            word.setCount(word.getCount() - 1);
+            val prevWords = word.getPrev();
+            for (MongoSubWord prevWord : prevWords) {
+                prevWord.setCount(prevWord.getCount() - 1);
+                val subWords = prevWord.getSubWords();
+                for (MongoSubWord subWord : subWords) {
+                    subWord.setCount(subWord.getCount() - 1);
+                }
+            }
+            val nextWords = word.getNext();
+            for (MongoSubWord nextWord : nextWords) {
+                nextWord.setCount(nextWord.getCount() - 1);
+                val subWords = nextWord.getSubWords();
+                for (MongoSubWord subWord : subWords) {
+                    subWord.setCount(subWord.getCount() - 1);
+                }
+            }
+            mongoTemplate.save(word);
+        }
+        val duration = Duration.between(initial, Instant.now());
+        log.info("MongoServiceImpl: successfully decremented words={}, duration={}", words.size(), duration);
+    }
+
+    @Scheduled(cron = "0 0 05 * * *") // at 05:00 UTC, on every day
+    private void removeZeroWords() {
+        val initial = Instant.now();
+        long removedElements = 0L;
+        long updatedWords = 0L;
+        val words = mongoTemplate.findAll(MongoWord.class);
+        for (MongoWord word : words) {
+            boolean needSave = false;
+            if (word.getCount() < 1) {
+                mongoTemplate.remove(word);
+                removedElements++;
+                updatedWords++;
+                continue;
+            }
+            val prevWordsIterator = word.getPrev().iterator();
+            while (prevWordsIterator.hasNext()) {
+                val prevWord = prevWordsIterator.next();
+                if (prevWord.getCount() < 1) {
+                    prevWordsIterator.remove();
+                    removedElements++;
+                    needSave = true;
+                } else {
+                    val subWordIterator = prevWord.getSubWords().iterator();
+                    while (subWordIterator.hasNext()) {
+                        val subWord = subWordIterator.next();
+                        if (subWord.getCount() < 1) {
+                            subWordIterator.remove();
+                            removedElements++;
+                            needSave = true;
+                        }
+                    }
+                }
+            }
+            val nextWordsIterator = word.getNext().iterator();
+            while (nextWordsIterator.hasNext()) {
+                val nextWord = nextWordsIterator.next();
+                if (nextWord.getCount() < 1) {
+                    nextWordsIterator.remove();
+                    removedElements++;
+                    needSave = true;
+                } else {
+                    val subWordIterator = nextWord.getSubWords().iterator();
+                    while (subWordIterator.hasNext()) {
+                        val subWord = subWordIterator.next();
+                        if (subWord.getCount() < 1) {
+                            subWordIterator.remove();
+                            removedElements++;
+                            needSave = true;
+                        }
+                    }
+                }
+            }
+            if (needSave) {
+                mongoTemplate.save(word);
+                updatedWords++;
+            }
+        }
+        val duration = Duration.between(initial, Instant.now());
+        log.info("MongoServiceImpl.RemoveZeroWords: successfully removed zero words. elements={}, updatedWords={}, duration={}", removedElements, updatedWords, duration);
+    }
+
+
+    @Scheduled(cron = "0 0 01 * * *") // at 01:00 UTC, on every day
+    private void deleteOldArticles() {
+        val initial = Instant.now();
+        LocalDateTime now = LocalDateTime.now().minusDays(1);
+        Query query = new Query();
+        query.addCriteria(Criteria.where("publishedAt").lt(now));
+        val removedArticles = mongoTemplate.findAllAndRemove(query, MongoArticle.class);
+        val duration = Duration.between(initial, Instant.now());
+        log.info("MongoServiceImpl.DeleteOldArticles: successfully removed old articles={}, duration={}", removedArticles.size(), duration);
     }
 }
