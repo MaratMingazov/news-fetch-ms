@@ -1,16 +1,16 @@
 package maratmingazov.news.fetch.model.mongodb;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NonNull;
-import org.jetbrains.annotations.Nullable;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Data
 @Builder
+@NoArgsConstructor
 @AllArgsConstructor
 @Document(collection = "word")
 public class MongoWord {
@@ -26,13 +26,26 @@ public class MongoWord {
     @Field("count")
     Long count;
 
-    @Nullable
+    @NonNull
     @Field("prev")
-    MongoSubWord prev;
+    List<MongoSubWord> prev = new ArrayList<>();
 
-    @Nullable
+    @NonNull
     @Field("next")
-    MongoSubWord next;
+    List<MongoSubWord> next = new ArrayList<>();
+
+    public MongoWord(@NonNull MongoQuintet quintet) {
+
+        val word_0 = MongoSubWord.builder().value(quintet.getWord_0()).count(1L).subWords(List.of()).build();
+        val word_4 = MongoSubWord.builder().value(quintet.getWord_4()).count(1L).subWords(List.of()).build();
+        val word_1 = MongoSubWord.builder().value(quintet.getWord_1()).count(1L).subWords(List.of(word_0)).build();
+        val word_3 = MongoSubWord.builder().value(quintet.getWord_3()).count(1L).subWords(List.of(word_4)).build();
+
+        this.value = quintet.getWord_2();
+        this.count = 1L;
+        this.prev = List.of(word_1);
+        this.next = List.of(word_3);
+    }
 
 
 }

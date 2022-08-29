@@ -4,8 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NonNull;
-import org.jetbrains.annotations.Nullable;
 import org.springframework.data.mongodb.core.mapping.Field;
+
+import java.util.List;
 
 @Data
 @Builder
@@ -20,11 +21,7 @@ public class MongoSubWord {
     @Field("count")
     Long count;
 
-    @Nullable
+    @NonNull
     @Field("prev")
-    MongoSubWord prev;
-
-    @Nullable
-    @Field("next")
-    MongoSubWord next;
+    List<MongoSubWord> subWords;
 }

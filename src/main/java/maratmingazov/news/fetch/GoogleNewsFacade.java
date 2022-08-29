@@ -22,7 +22,7 @@ public class GoogleNewsFacade {
     private final MongoService mongoService;
 
 
-    @Scheduled(fixedDelay = 60000)
+    @Scheduled(fixedDelay = 3600000) // every hour
     public void fetchNews() {
 
         val news = googleNewsApi.getNews();
@@ -43,8 +43,9 @@ public class GoogleNewsFacade {
             val articles = response.getArticles();
             val savedArticles = mongoService.saveArticles(articles);
             val quintets = mongoService.calculateQuintets(savedArticles);
+            val incrementedWords = mongoService.saveQuintets(quintets);
 
-            log.info("GoogleNewsFacade: successfully fetched news: articles={}, savedArticles={}, quintets={}", articles.size(), savedArticles.size(), quintets.size());
+            log.info("GoogleNewsFacade: successfully fetched news: articles={}, savedArticles={}, quintets={}, incrementedWords={}", articles.size(), savedArticles.size(), quintets.size(), incrementedWords);
         } catch (JsonProcessingException e) {
             log.error("GoogleNewsFacade: json parsing exception e={}, json={}", e.getMessage(), newsResponseJson);
         }

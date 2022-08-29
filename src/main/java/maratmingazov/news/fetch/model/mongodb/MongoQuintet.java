@@ -9,6 +9,9 @@ import lombok.Value;
 public class MongoQuintet {
 
     @NonNull
+    String word_0;
+
+    @NonNull
     String word_1;
 
     @NonNull
@@ -19,8 +22,5 @@ public class MongoQuintet {
 
     @NonNull
     String word_4;
-
-    @NonNull
-    String word_5;
 
 }

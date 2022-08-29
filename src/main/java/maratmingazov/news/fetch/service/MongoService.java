@@ -14,4 +14,7 @@ public interface MongoService {
 
     @NonNull
     List<MongoQuintet> calculateQuintets(@NonNull List<MongoArticle> articles);
+
+    @NonNull
+    Integer saveQuintets(@NonNull List<MongoQuintet> quintets);
 }

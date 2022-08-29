@@ -7,10 +7,14 @@ import lombok.val;
 import maratmingazov.news.fetch.model.google.GoogleNewsArticle;
 import maratmingazov.news.fetch.model.mongodb.MongoArticle;
 import maratmingazov.news.fetch.model.mongodb.MongoQuintet;
+import maratmingazov.news.fetch.model.mongodb.MongoSubWord;
+import maratmingazov.news.fetch.model.mongodb.MongoWord;
+import maratmingazov.news.fetch.repository.WordRepository;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +22,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 @Log4j2
@@ -26,6 +31,7 @@ import java.util.stream.Collectors;
 public class MongoServiceImpl implements MongoService {
 
     private final MongoTemplate mongoTemplate;
+    private final WordRepository wordRepository;
 
     @NonNull
     @Override
@@ -45,7 +51,7 @@ public class MongoServiceImpl implements MongoService {
                     )
             );
             val existingDocument = mongoTemplate.findOne(query, MongoArticle.class);
-            if(existingDocument == null) {
+            //if(existingDocument == null) {
                 val mongoArticle = MongoArticle.builder()
                         .title(article.getTitle())
                         .description(article.getDescription())
@@ -54,7 +60,7 @@ public class MongoServiceImpl implements MongoService {
                         .build();
                 val savedArticle = mongoTemplate.save(mongoArticle);
                 mongoArticles.add(savedArticle);
-            }
+            //}
         }
 
         return mongoArticles;
@@ -80,7 +86,16 @@ public class MongoServiceImpl implements MongoService {
             return quintets;
         }
 
-        val words = Arrays.stream(sentence.split( " ")).collect(Collectors.toList());
+        val words = Arrays.stream(sentence.toLowerCase(Locale.ROOT).split( " ")).collect(Collectors.toList());
+        words.remove(" ");
+        words.remove("the");
+        words.remove("to");
+        words.remove("is");
+        words.remove("in");
+        words.remove("on");
+        words.remove("of");
+        words.remove("a");
+        words.remove("-");
         if (words.size() < 4) {
             return quintets;
         }
@@ -111,12 +126,110 @@ public class MongoServiceImpl implements MongoService {
 
 
 
-    @Scheduled(fixedDelay = 60000)
+//    @Scheduled(fixedDelay = 60000)
+    @Scheduled(cron = "0 0 05 * * *") // at 05:00 UTC, on every day
     private void deleteOldArticles() {
         LocalDateTime now = LocalDateTime.now().minusDays(1);
         Query query = new Query();
         query.addCriteria(Criteria.where("publishedAt").lt(now));
         val removedArticles = mongoTemplate.findAllAndRemove(query, MongoArticle.class);
         log.info("MongoServiceImpl: successfully removed old articles={}", removedArticles.size());
+    }
+
+    @NonNull
+    @Override
+    public Integer saveQuintets(@NonNull List<MongoQuintet> quintets) {
+        Integer incrementedWords = 0;
+        List<MongoWord> newMongoWords = new ArrayList<>();
+        List<MongoWord> updatedMongoWords = new ArrayList<>();
+
+        int localIncr = 0;
+        for (MongoQuintet quintet : quintets) {
+            Query query = new Query();
+            query.addCriteria(Criteria.where("value").is(quintet.getWord_2()));
+
+            val existingMongoWord = mongoTemplate.findOne(query, MongoWord.class);
+            if (existingMongoWord == null) {
+                val newMongoWord = new MongoWord(quintet);
+                newMongoWords.add(newMongoWord);
+            } else {
+                incrementedWords += updateExistingMongoWord(existingMongoWord, quintet);
+                updatedMongoWords.add(existingMongoWord);
+                mongoTemplate.save(existingMongoWord);
+            }
+        }
+
+        mongoTemplate.insertAll(newMongoWords);
+        //wordRepository.saveAll(updatedMongoWords);
+
+        return incrementedWords;
+    }
+
+    private Integer updateExistingMongoWord(@NonNull MongoWord mongoWord, @NonNull MongoQuintet quintet) {
+        Integer incrementedWords = 0;
+
+        mongoWord.setCount(mongoWord.getCount() + 1);
+        incrementedWords++;
+
+        boolean foundNextWord = false;
+        val nextWords = mongoWord.getNext();
+        for (MongoSubWord nextWord : nextWords) {
+            if (nextWord.getValue().equals(quintet.getWord_3())) {
+                nextWord.setCount(nextWord.getCount() + 1);
+                incrementedWords++;
+
+                boolean foundSubWord = false;
+                val subWords = nextWord.getSubWords();
+                for (MongoSubWord subWord : subWords) {
+                    if (subWord.getValue().equals(quintet.getWord_4())) {
+                        subWord.setCount(subWord.getCount() + 1);
+                        incrementedWords++;
+                        foundSubWord = true;
+                    }
+                }
+                if (!foundSubWord) {
+                    val subWord = MongoSubWord.builder().value(quintet.getWord_4()).count(1L).subWords(List.of()).build();
+                    subWords.add(subWord);
+                }
+            }
+        }
+        if (!foundNextWord) {
+            val subWord = MongoSubWord.builder().value(quintet.getWord_4()).count(1L).subWords(List.of()).build();
+            val nextWord = MongoSubWord.builder().value(quintet.getWord_3()).count(1L).subWords(List.of(subWord)).build();
+            nextWords.add(nextWord);
+        }
+
+
+
+        boolean foundPrevWord = false;
+        val prevWords = mongoWord.getPrev();
+        for (MongoSubWord prevWord : prevWords) {
+            if (prevWord.getValue().equals(quintet.getWord_1())) {
+                prevWord.setCount(prevWord.getCount() + 1);
+                incrementedWords++;
+
+                boolean foundSubWord = false;
+                val subWords = prevWord.getSubWords();
+                for (MongoSubWord subWord : subWords) {
+                    if (subWord.getValue().equals(quintet.getWord_0())) {
+                        subWord.setCount(subWord.getCount() + 1);
+                        incrementedWords++;
+                        foundSubWord = true;
+                    }
+                }
+                if (!foundSubWord) {
+                    val subWord = MongoSubWord.builder().value(quintet.getWord_0()).count(1L).subWords(List.of()).build();
+                    subWords.add(subWord);
+                }
+            }
+        }
+        if (!foundPrevWord) {
+            val subWord = MongoSubWord.builder().value(quintet.getWord_0()).count(1L).subWords(List.of()).build();
+            val prevWord = MongoSubWord.builder().value(quintet.getWord_1()).count(1L).subWords(List.of(subWord)).build();
+            prevWords.add(prevWord);
+        }
+
+
+        return incrementedWords;
     }
 }
