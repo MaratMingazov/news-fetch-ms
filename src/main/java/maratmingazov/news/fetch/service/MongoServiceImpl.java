@@ -86,15 +86,8 @@ public class MongoServiceImpl implements MongoService {
         }
 
         val words = Arrays.stream(sentence.toLowerCase(Locale.ROOT).split( " ")).collect(Collectors.toList());
-        words.remove(" ");
-        words.remove("the");
-        words.remove("to");
-        words.remove("is");
-        words.remove("in");
-        words.remove("on");
-        words.remove("of");
-        words.remove("a");
-        words.remove("-");
+        words.removeAll(List.of(" ", "-", "a", "is", "in", "on", "of", "the", "to"));
+
         if (words.size() < 4) {
             return quintets;
         }
