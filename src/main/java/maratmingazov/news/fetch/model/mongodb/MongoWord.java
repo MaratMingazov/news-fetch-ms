@@ -1,6 +1,7 @@
 package maratmingazov.news.fetch.model.mongodb;
 
 import lombok.*;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
@@ -13,7 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Document(collection = "word")
-public class MongoWord {
+public class MongoWord implements Comparable<MongoWord> {
 
     @Id
     String id;
@@ -48,4 +49,13 @@ public class MongoWord {
     }
 
 
+    @Override
+    public int compareTo(@NotNull MongoWord word) {
+        if(count.equals(word.count))
+            return 0;
+        else if(count > word.count)
+            return -1;
+        else
+            return 1;
+    }
 }

@@ -31,9 +31,9 @@ public class MongoSubWord implements Comparable<MongoSubWord> {
         if(count.equals(word.count))
             return 0;
         else if(count > word.count)
-            return 1;
-        else
             return -1;
+        else
+            return 1;
     }
 
 }
