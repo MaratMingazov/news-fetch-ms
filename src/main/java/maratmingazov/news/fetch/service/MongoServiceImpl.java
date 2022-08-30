@@ -21,10 +21,7 @@ import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Log4j2
@@ -143,6 +140,11 @@ public class MongoServiceImpl implements MongoService {
                 newMongoWords.add(newMongoWord);
             } else {
                 incrementedWords += updateExistingMongoWord(existingMongoWord, quintet);
+                Collections.sort(existingMongoWord.getPrev());
+                Collections.sort(existingMongoWord.getNext());
+                existingMongoWord.getPrev().forEach(prev -> Collections.sort(prev.getSubWords()));
+                existingMongoWord.getNext().forEach(next -> Collections.sort(next.getSubWords()));
+
                 updatedMongoWords.add(existingMongoWord);
                 mongoTemplate.save(existingMongoWord);
             }
