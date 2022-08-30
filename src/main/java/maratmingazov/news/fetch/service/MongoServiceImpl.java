@@ -85,8 +85,22 @@ public class MongoServiceImpl implements MongoService {
             return quintets;
         }
 
+        sentence = sentence.replace(",","");
+        sentence = sentence.replace(".","");
+        sentence = sentence.replace("|","");
         val words = Arrays.stream(sentence.toLowerCase(Locale.ROOT).split( " ")).collect(Collectors.toList());
-        words.removeAll(List.of(" ", "-", "a", "is", "in", "on", "of", "the", "to"));
+        words.removeAll(
+                List.of(" ", "-",
+                        "a", "an", "and", "as", "at",
+                        "be", "by",
+                        "has", "have", "his", "her",
+                        "for",
+                        "is", "in", "its",
+                        "on", "of",
+                        "that", "the", "to",
+                        "was", "will", "with"
+                )
+        );
 
         if (words.size() < 4) {
             return quintets;
