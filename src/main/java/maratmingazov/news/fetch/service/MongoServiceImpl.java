@@ -166,6 +166,7 @@ public class MongoServiceImpl implements MongoService {
             if (nextWord.getValue().equals(quintet.getWord_3())) {
                 nextWord.setCount(nextWord.getCount() + 1);
                 incrementedWords++;
+                foundNextWord = true;
 
                 boolean foundSubWord = false;
                 val subWords = nextWord.getSubWords();
@@ -196,6 +197,7 @@ public class MongoServiceImpl implements MongoService {
             if (prevWord.getValue().equals(quintet.getWord_1())) {
                 prevWord.setCount(prevWord.getCount() + 1);
                 incrementedWords++;
+                foundPrevWord = true;
 
                 boolean foundSubWord = false;
                 val subWords = prevWord.getSubWords();

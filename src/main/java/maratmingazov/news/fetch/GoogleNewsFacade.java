@@ -12,6 +12,9 @@ import maratmingazov.news.fetch.service.MongoService;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
+import java.time.Instant;
+
 @Log4j2
 @Service
 @RequiredArgsConstructor
@@ -39,13 +42,15 @@ public class GoogleNewsFacade {
             return;
         }
         try {
+            val initial = Instant.now();
             val response = objectMapper.readValue(newsResponseJson, GoogleNewsResponse.class);
             val articles = response.getArticles();
             val savedArticles = mongoService.saveArticles(articles);
             val quintets = mongoService.calculateQuintets(savedArticles);
             val incrementedWords = mongoService.saveQuintets(quintets);
+            val duration = Duration.between(initial, Instant.now());
 
-            log.info("GoogleNewsFacade: successfully fetched news: articles={}, savedArticles={}, quintets={}, incrementedWords={}", articles.size(), savedArticles.size(), quintets.size(), incrementedWords);
+            log.info("GoogleNewsFacade: successfully fetched news: articles={}, savedArticles={}, quintets={}, incrementedWords={}, duration={}", articles.size(), savedArticles.size(), quintets.size(), incrementedWords, duration);
         } catch (JsonProcessingException e) {
             log.error("GoogleNewsFacade: json parsing exception e={}, json={}", e.getMessage(), newsResponseJson);
         }
