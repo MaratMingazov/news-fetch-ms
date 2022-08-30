@@ -234,7 +234,7 @@ public class MongoServiceImpl implements MongoService {
     }
 
 
-    @Scheduled(cron = "0 0 03 * * *") // at 03:00 UTC, on every day
+    @Scheduled(cron = "0 0 05 * * *") // at 03:00 UTC, on every day
     private void decrementCounts() {
         val initial = Instant.now();
         val words = mongoTemplate.findAll(MongoWord.class);
@@ -262,7 +262,7 @@ public class MongoServiceImpl implements MongoService {
         log.info("MongoServiceImpl: successfully decremented words={}, duration={}", words.size(), duration);
     }
 
-    @Scheduled(cron = "0 0 05 * * *") // at 05:00 UTC, on every day
+    @Scheduled(cron = "0 0 03 * * *") // at 05:00 UTC, on every day
     private void removeZeroWords() {
         val initial = Instant.now();
         long removedElements = 0L;
