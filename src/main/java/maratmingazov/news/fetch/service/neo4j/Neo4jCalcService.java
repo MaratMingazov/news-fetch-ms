@@ -69,7 +69,7 @@ public class Neo4jCalcService {
                 )
         );
 
-        if ("-".equals(words.get(words.size()-2))) {
+        if (words.size() > 2 &&  "-".equals(words.get(words.size()-2))) {
             words.remove(words.size()-2);
             words.remove(words.size()-1);
         }
