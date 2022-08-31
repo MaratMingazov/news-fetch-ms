@@ -8,6 +8,12 @@ spring:
     allow-bean-definition-overriding: true
 
 
+  neo4j:
+    uri: ${NEO4J_URL}
+    authentication:
+      username: ${NEO4J_USERNAME}
+      password: ${NEO4J_PASSWORD}
+
 springdoc:
   title: @app.name@
   description: @app.description@
