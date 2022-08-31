@@ -32,6 +32,9 @@ public class Neo4jDBService implements CommandLineRunner {
     private final Driver driver;
 
     public void updatePairs(@NonNull Pair<List<String>, @NonNull List<NeoRelation>> pair) {
+        if (pair.getLeft().isEmpty() || pair.getRight().isEmpty()) {
+            return;
+        }
         try (Session session = driver.session(SessionConfig.forDatabase("neo4j"))) {
             updateWords(pair.getLeft(), session);
             updateRelations(pair.getRight(), session);
