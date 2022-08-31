@@ -1,4 +1,4 @@
-package maratmingazov.news.fetch.service;
+package maratmingazov.news.fetch.service.google;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +13,7 @@ import reactor.core.publisher.Mono;
 @Log4j2
 @Service
 @RequiredArgsConstructor
-public class GoogleNewsApi implements NewsApiService {
+public class GoogleNewsService {
 
     private final WebClient webClient;
 
@@ -21,7 +21,6 @@ public class GoogleNewsApi implements NewsApiService {
     private String url;
 
     @NonNull
-    @Override
     public Mono<String> getNews() {
 
         val uriSpec = webClient.get();

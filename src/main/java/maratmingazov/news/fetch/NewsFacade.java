@@ -7,8 +7,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import lombok.val;
 import maratmingazov.news.fetch.model.google.GoogleNewsResponse;
-import maratmingazov.news.fetch.service.GoogleNewsApi;
-import maratmingazov.news.fetch.service.MongoService;
+import maratmingazov.news.fetch.service.google.GoogleNewsService;
+import maratmingazov.news.fetch.service.mongo.MongoService;
 import maratmingazov.news.fetch.service.neo4j.Neo4jCalcService;
 import maratmingazov.news.fetch.service.neo4j.Neo4jDBService;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -20,9 +20,9 @@ import java.time.Instant;
 @Log4j2
 @Service
 @RequiredArgsConstructor
-public class GoogleNewsFacade {
+public class NewsFacade {
 
-    private final GoogleNewsApi googleNewsApi;
+    private final GoogleNewsService googleNewsApi;
     private final ObjectMapper objectMapper;
     private final MongoService mongoService;
     private final Neo4jDBService neo4jService;
