@@ -7,7 +7,6 @@ import org.neo4j.driver.Record;
 import org.neo4j.driver.*;
 import org.neo4j.driver.exceptions.Neo4jException;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,8 +21,6 @@ public class Neo4jService implements CommandLineRunner {
 
     private final Driver driver;
 
-
-    @Scheduled(fixedDelay = 3111000) // every hour
     public void updateWords(@NonNull List<String> words) {
         try (Session session = driver.session(SessionConfig.forDatabase("neo4j"))) {
             Map<String, Long> wordsMap = words.stream().collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
@@ -34,7 +31,6 @@ public class Neo4jService implements CommandLineRunner {
             throw e;
         }
     }
-
 
     private TransactionWork<List<Record>> updateWords(Map<String, Long> words) {
         return tx -> {
