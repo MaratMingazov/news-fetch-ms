@@ -9,6 +9,7 @@ import lombok.val;
 import maratmingazov.news.fetch.model.google.GoogleNewsResponse;
 import maratmingazov.news.fetch.service.GoogleNewsApi;
 import maratmingazov.news.fetch.service.MongoService;
+import maratmingazov.news.fetch.service.neo4j.Neo4jService;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +24,7 @@ public class GoogleNewsFacade {
     private final GoogleNewsApi googleNewsApi;
     private final ObjectMapper objectMapper;
     private final MongoService mongoService;
+    private final Neo4jService neo4jService;
 
 
     @Scheduled(fixedDelay = 3600000) // every hour
@@ -46,11 +48,10 @@ public class GoogleNewsFacade {
             val response = objectMapper.readValue(newsResponseJson, GoogleNewsResponse.class);
             val articles = response.getArticles();
             val savedArticles = mongoService.saveArticles(articles);
-            val quintets = mongoService.calculateQuintets(savedArticles);
-            val incrementedWords = mongoService.saveQuintets(quintets);
+            val pairs = neo4jService.getPairs(savedArticles);
+            neo4jService.updatePairs(pairs);
             val duration = Duration.between(initial, Instant.now());
-
-            log.info("GoogleNewsFacade: successfully fetched news: articles={}, savedArticles={}, quintets={}, incrementedWords={}, duration={}", articles.size(), savedArticles.size(), quintets.size(), incrementedWords, duration);
+            log.info("GoogleNewsFacade: successfully fetched news: articles={}, savedArticles={}, words={}, relations={}, duration={}", articles.size(), savedArticles.size(), pairs.getLeft().size(), pairs.getRight().size(), duration);
         } catch (JsonProcessingException e) {
             log.error("GoogleNewsFacade: json parsing exception e={}, json={}", e.getMessage(), newsResponseJson);
         }
@@ -60,8 +61,5 @@ public class GoogleNewsFacade {
     private void handleErrorResponse(@NonNull Throwable response) {
         log.error("GoogleNewsFacade: news fetch error={}", response.getMessage());
     }
-
-
-
 
 }
