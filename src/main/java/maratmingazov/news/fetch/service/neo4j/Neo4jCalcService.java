@@ -61,7 +61,7 @@ public class Neo4jCalcService {
 
         words = Arrays.stream(sentence.toLowerCase(Locale.ROOT).split( " ")).collect(Collectors.toList());
         words.removeAll(
-                List.of(" ", "-",
+                List.of(" ", "-", "",
                         "1", "2", "3", "4", "5", "6", "7", "8", "9", "0",
                         "a", "after", "all", "an", "and", "are", "as", "at",
                         "be", "been", "before", "but", "by",
