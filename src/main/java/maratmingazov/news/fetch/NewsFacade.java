@@ -11,6 +11,7 @@ import maratmingazov.news.fetch.service.google.GoogleNewsService;
 import maratmingazov.news.fetch.service.mongo.MongoService;
 import maratmingazov.news.fetch.service.neo4j.Neo4jCalcService;
 import maratmingazov.news.fetch.service.neo4j.Neo4jDBService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -28,19 +29,37 @@ public class NewsFacade {
     private final Neo4jDBService neo4jService;
     private final Neo4jCalcService neo4jCalcService;
 
+    @Value("${google-news.en-url}")
+    private String enUrl;
 
-    @Scheduled(fixedDelay = 3600000) // every hour
-    public void fetchNews() {
+    @Value("${google-news.ru-url}")
+    private String ruUrl;
 
-        val news = googleNewsApi.getNews();
+
+//    @Scheduled(fixedDelay = 3600000) // every hour
+    @Scheduled(cron = "0 15 * * * *") // at 15 minute , on every hour
+    public void fetchEnNews() {
+
+        val news = googleNewsApi.getNews(enUrl);
         news.subscribe(
-                this::handleSuccessResponse,
+                success -> handleSuccessResponse(success, "EN"),
                 this::handleErrorResponse
         );
-
     }
 
-    private void handleSuccessResponse(@NonNull String newsResponseJson) {
+//    @Scheduled(fixedDelay = 3600000) // every hour
+    @Scheduled(cron = "0 30 * * * *") // at 30 minute , on every hour
+    public void fetchRuNews() {
+
+        val news = googleNewsApi.getNews(ruUrl);
+        news.subscribe(
+                success -> handleSuccessResponse(success, "RU"),
+                this::handleErrorResponse
+        );
+    }
+
+    private void handleSuccessResponse(@NonNull String newsResponseJson, @NonNull String lang) {
+        log.info("GoogleNewsFacade: starting analyze lang={}", lang);
         if(newsResponseJson.isEmpty()) {
             log.error("GoogleNewsFacade: empty newsResponseJson={}", newsResponseJson);
             return;

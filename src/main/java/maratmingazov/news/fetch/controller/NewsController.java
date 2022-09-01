@@ -17,8 +17,7 @@ public class NewsController {
     private final GoogleNewsService googleNewsService;
 
     @GetMapping()
-    public ResponseEntity<String> refreshToken() {
-        googleNewsService.getNews();
+    public ResponseEntity<String> getNews() {
         return ResponseEntity.ok("YES");
     }
 }

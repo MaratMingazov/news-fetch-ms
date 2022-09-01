@@ -44,7 +44,8 @@ info:
   build-timestamp: @maven.build.timestamp@
 
 google-news:
-  url: ${GOOGLE_NEWS_URL}
+  en-url: ${GOOGLE_NEWS_EN_URL}
+  ru-url: ${GOOGLE_NEWS_RU_URL}
 
 mongodb:
   url: ${MONGO_DB_URL}
