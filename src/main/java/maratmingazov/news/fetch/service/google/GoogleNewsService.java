@@ -4,7 +4,6 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import lombok.val;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -17,11 +16,8 @@ public class GoogleNewsService {
 
     private final WebClient webClient;
 
-    @Value("${google-news.url}")
-    private String url;
-
     @NonNull
-    public Mono<String> getNews() {
+    public Mono<String> getNews(@NonNull String url) {
 
         val uriSpec = webClient.get();
         val headersSpec = uriSpec.uri(url);
