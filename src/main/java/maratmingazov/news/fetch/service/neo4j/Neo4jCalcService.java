@@ -54,18 +54,29 @@ public class Neo4jCalcService {
         sentence = sentence.replace("|","");
         sentence = sentence.replace("\"","");
         sentence = sentence.replace("?","");
+        sentence = sentence.replace("!","");
+        sentence = sentence.replace("&","");
+        sentence = sentence.replace("'","");
+        sentence = sentence.replace(":","");
 
         words = Arrays.stream(sentence.toLowerCase(Locale.ROOT).split( " ")).collect(Collectors.toList());
         words.removeAll(
                 List.of(" ", "-",
-                        "a", "an", "and", "as", "at",
-                        "be", "by",
-                        "has", "have", "his", "her",
-                        "for",
-                        "is", "in", "its",
-                        "on", "of",
-                        "that", "the", "to",
-                        "was", "will", "with"
+                        "1", "2", "3", "4", "5", "6", "7", "8", "9", "0",
+                        "a", "after", "all", "an", "and", "are", "as", "at",
+                        "be", "been", "before", "but", "by",
+                        "had", "has", "have", "his", "he", "her", "how",
+                        "can", "could",
+                        "for", "from",
+                        "is", "in", "into", "it", "its",
+                        "last",
+                        "may", "more",
+                        "now",
+                        "on", "of", "over", "or", "out",
+                        "said", "says",
+                        "than", "that", "the", "they", "their", "this", "to",
+                        "up",
+                        "was", "what", "when", "where", "who", "will", "with"
                 )
         );
 
