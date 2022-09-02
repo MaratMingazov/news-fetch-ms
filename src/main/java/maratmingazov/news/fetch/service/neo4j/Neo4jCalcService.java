@@ -61,22 +61,27 @@ public class Neo4jCalcService {
 
         words = Arrays.stream(sentence.toLowerCase(Locale.ROOT).split( " ")).collect(Collectors.toList());
         words.removeAll(
-                List.of(" ", "-", "",
+                List.of(" ", "-", "", "—",
                         "1", "2", "3", "4", "5", "6", "7", "8", "9", "0",
-                        "a", "after", "all", "an", "and", "are", "as", "at",
-                        "be", "been", "before", "but", "by",
+                        "a", "about", "after", "all", "an", "and", "are", "as", "at",
+                        "be", "been", "being", "between", "before", "but", "by",
                         "had", "has", "have", "his", "he", "her", "how",
                         "can", "could",
                         "for", "from",
-                        "is", "in", "into", "it", "its",
+                        "i", "is", "in", "into", "it", "its", "if",
                         "last",
                         "may", "more",
-                        "now",
+                        "no", "now", "new", "not",
                         "on", "of", "over", "or", "out",
                         "said", "says",
-                        "than", "that", "the", "they", "their", "this", "to",
+                        "than", "that", "the", "they", "there", "their", "this", "to",
                         "up",
-                        "was", "what", "when", "where", "who", "will", "with"
+                        "was", "we", "were", "what", "when", "where", "who", "will", "with",
+                        "в",
+                        "на", "не",
+                        "и",
+                        "по",
+                        "с"
                 )
         );
 
