@@ -39,8 +39,9 @@ public class Neo4jDBService implements CommandLineRunner {
             updateWords(pair.getLeft(), session);
             updateRelations(pair.getRight(), session);
         } catch (Exception e) {
-            log.error("Neo4JService.updatePairs: exception={}", e.getMessage());
-            throw e;
+//            log.error("Neo4JService.updatePairs: exception={}", e.getMessage());
+            log.error("Neo4JService.updatePairs: exception.");
+//            throw e;
         }
     }
 
@@ -53,7 +54,8 @@ public class Neo4jDBService implements CommandLineRunner {
             session.writeTransaction(executeQuery("MATCH (:Word)-[r]->(:Word)\n WHERE r.count < 1\n DELETE  r"));
             log.info("Neo4jService.deleteZeroWords: successfully deleted zeroWords={}, zeroRelations={}", zeroWords.size(), zeroRelations.size());
         } catch (Exception e) {
-            log.error("Neo4JService.deleteZeroWords: exception={}", e.getMessage());
+            //log.error("Neo4JService.deleteZeroWords: exception={}", e.getMessage());
+            log.error("Neo4JService.deleteZeroWords: exception.");
         }
     }
 
@@ -76,7 +78,7 @@ public class Neo4jDBService implements CommandLineRunner {
         Map<String, Long> batchOfWords = new HashMap<>();
         for (Map.Entry<String, Long> entry : wordsMap.entrySet()) {
             counter++;
-            if (counter > 200) {
+            if (counter > 100) {
                 counter = 0;
                 val batchOfWordsQuery = mergeBatchOfWordsQuery(batchOfWords);
                 session.writeTransaction(executeQuery(batchOfWordsQuery));
@@ -112,7 +114,8 @@ public class Neo4jDBService implements CommandLineRunner {
                 Result result = tx.run(query);
                 return result.list();
             } catch (Neo4jException e) {
-                log.error("Neo4JService.executeQuery: exception, query={}, e={}", query, e.getMessage());
+//                log.error("Neo4JService.executeQuery: exception, query={}, e={}", query, e.getMessage());
+                log.error("Neo4JService.executeQuery: exception. return empty list.");
                 return List.of();
             }
         };
