@@ -74,7 +74,7 @@ public class Neo4jCalcService {
                         "last", "latest", "launch", "live",
                         "may", "more",
                         "ndtv", "no", "now", "new", "news", "not",
-                        "on", "one", "of", "over", "or", "out",
+                        "on", "one", "of", "over", "or", "out", "our",
                         "said", "says", "she",
                         "than", "that", "the", "they", "there", "their", "this", "to", "today", "times",
                         "up", "you", "us",
@@ -82,6 +82,7 @@ public class Neo4jCalcService {
                         "was", "we", "were", "what", "when", "where", "which", "who", "will", "with",
                         "в",
                         "на", "не",
+                        "за",
                         "и",
                         "по",
                         "с"
