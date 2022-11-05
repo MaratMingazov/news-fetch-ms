@@ -41,7 +41,7 @@ public class NewsFacade {
 
         val news = googleNewsApi.getNews(enUrl);
         news.subscribe(
-                success -> handleSuccessResponse(success, "EN"),
+                success -> handleSuccessNewsResponse(success, "EN"),
                 this::handleErrorResponse
         );
     }
@@ -52,12 +52,12 @@ public class NewsFacade {
 
         val news = googleNewsApi.getNews(ruUrl);
         news.subscribe(
-                success -> handleSuccessResponse(success, "RU"),
+                success -> handleSuccessNewsResponse(success, "RU"),
                 this::handleErrorResponse
         );
     }
 
-    private void handleSuccessResponse(@NonNull String newsResponseJson, @NonNull String lang) {
+    private void handleSuccessNewsResponse(@NonNull String newsResponseJson, @NonNull String lang) {
         log.info("GoogleNewsFacade: starting analyze lang={}", lang);
         if(newsResponseJson.isEmpty()) {
             log.error("GoogleNewsFacade: empty newsResponseJson={}", newsResponseJson);
