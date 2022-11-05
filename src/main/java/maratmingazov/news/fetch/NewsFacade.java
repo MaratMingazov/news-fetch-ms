@@ -36,7 +36,6 @@ public class NewsFacade {
     private String ruUrl;
 
 
-//    @Scheduled(fixedDelay = 3600000) // every hour
     @Scheduled(cron = "0 15 * * * *") // at 15 minute , on every hour
     public void fetchEnNews() {
 
